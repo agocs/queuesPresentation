@@ -8,6 +8,11 @@ chris@agocs.org
 http://agocs.org
 @agox
 
+* Viewers on the internet
+
+The examples in this presentation require a local RabbitMQ instance running on localhost:5672. They won't work on go-talks.appsopot.com
+
+If you'd like, you can clone this repo, install RabbitMQ, and run everything using `golang.org/x/tools/cmd/present`.
 
 * Queue Basics
 
