@@ -1,0 +1,168 @@
+Queue Brokers
+or, how I learned to stop worrying and subscribe to topics
+14 Nov 2015
+
+Christopher Agocs
+Software Engineer, DramaFever
+chris@agocs.org
+http://agocs.org
+@agox
+
+
+* Queue Basics
+
+* Queue Basics
+
+- Producer produces
+- Message goes in
+- Message comes out
+- Consumer consumes
+
+* Queue Brokers
+
+- What is a queue broker anyway
+- Why would I use a queue broker
+
+* What
+
+- Service that provides queues
+- Queues come and go
+
+* Why
+
+- Services need to talk to each other
+- Long processes
+- Bursty traffic
+
+* Let's pretend
+
+- We're building a bank
+- We have to deal with card swipes
+- People get mad when we mess up
+
+* Basic queues
+
+Two services
+- Cardswipe reader
+- Debit processor
+
+* Basic named queue
+
+- Cardswipe Reader gets a swipe
+- Sends it over to Debit Processor
+
+* Diagram
+.image images/simpleConsumer.png _ 800
+
+* Example of Basic Queue
+
+* Publishing a message
+.play examples/simplePublish.go /START4 OMIT/,/END4 OMIT/
+
+
+* Consuming a message
+.play examples/simpleConsume.go /START4 OMIT/,/END4 OMIT/
+
+* Work queue
+
+- Debit Processing takes too long =(
+- Queue is filling up!
+- Add more Debit Processors!
+
+* Work queue 
+
+- Each Debit Processor processes as it gets a chance
+- Add more until the queue stops filling up 
+
+* Work queue
+
+- Single named queue
+- Each subscriber pulls a message off
+- Does whatever 
+
+* Diagram
+.image images/workerQueue.png _ 700
+
+* Publishing to a work queue
+
+.play examples/simplePublish.go /START4 OMIT/,/END4 OMIT/
+
+* Multiple consumers consuming
+.play examples/multipleConsume.go /START4 OMIT/,/END4 OMIT/
+
+* Fraud =(
+
+- Fraud happens
+- Fraudomatic 5000!
+
+* Fraudomatic 5000
+
+- Separates good transactions from bad
+
+* Fraud handling
+
+- Receive card swipe
+- Detect fraud
+- Successes get processed
+- Failures get forwarded to Fraud Specialists
+
+* Exchanges
+
+- Alternative to named queues
+- Queue Broker forwards messages to 0 or more queues
+
+* Routing Keys and Topics
+
+- Strings that route messages
+- Consumers subscribe to topics
+- Queue broker automagically creates queues
+- Consumers get messages
+
+* Fraudomatic 
+
+- Fraudomatic reads from `TransactionFirehose` queue
+- Creates `PostFraudExchange` exchange
+- Successes go to `Transactions.Success`
+- Failures go to `Transactions.Failure`
+
+* Successful Transaction Handler
+
+- Subscribes to `Transactions.Success`
+
+* Fraud Specialists
+
+- Subscribe to `Transactions.Failure`
+
+* Transaction Logger
+
+- Subscribes to `Transactions.#`
+- Wildcard!
+
+* Diagram
+.image images/bigPicture.png _ 700
+
+* Let's create some transactions
+.play examples/simplePublish.go /START4 OMIT/,/END4 OMIT/
+
+* Fraudomatic
+.play examples/fraudConsumePublish.go /START4 OMIT/,/END4 OMIT/
+
+* Success
+.play examples/subscribeToSuccess.go /BINDSTART OMIT/,/BINDEND OMIT/
+
+* Fraud Specialists
+.play examples/subscribeToFailure.go /BINDSTART OMIT/,/BINDEND OMIT/
+
+* Transaction Logger
+.play examples/subscribeToMultiple.go /BINDSTART OMIT/,/BINDEND OMIT/
+
+* Queue Brokers
+
+AMQP
+- RabbitMQ
+- ActiveMQ
+- Iron.io IronMQ
+
+Others
+- ZeroMQ
+- Amazon SQS
